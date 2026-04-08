@@ -1,42 +1,97 @@
 # Blackjack ML Agents
 
-An interactive simulation of AI agents learning to play blackjack through evolutionary optimization. Built as a visual demonstration of machine learning, algorithmic thinking, and systems design.
+An interactive simulation of AI agents learning to play blackjack through evolutionary optimization.
 
-## What It Does
+https://github.com/user-attachments/assets/ml-blackjack.mov
 
-Five agents compete at a shared 6-deck blackjack table. Each agent has a unique betting strategy defined by three parameters (threshold, slope, max spread) that determine how they size bets based on the Hi-Lo card count. The Cross-Entropy Method evolves these strategies over generations, selecting the top performers and refining the population toward optimal bet-sizing.
+## About
+
+This project demonstrates machine learning, algorithmic thinking, and systems design through a live blackjack simulation. Five AI agents compete at a shared table, each evolving their own betting strategy over time using the Cross-Entropy Method. The simulation visualizes how agents learn to exploit card counting signals, manage risk based on their position, and adapt to changing conditions across rounds. Built as a technical showcase exploring the intersection of reinforcement learning concepts and interactive web development.
+
+## Demo
+
+https://user-images.githubusercontent.com/ml-blackjack.mov
+
+> Recording of the live simulation showing agents competing, card counting stats, and the learning progress dashboard.
 
 ## How It Works
 
-**Cross-Entropy Method (CEM):** A population-based optimization algorithm. Each generation samples strategies from a distribution, simulates hundreds of hands per strategy, selects the elite performers, and updates the distribution toward the winners. Over time, the population converges on strategies that minimize losses against the house edge.
+### Cross-Entropy Method
 
-**Hi-Lo Card Counting:** All agents share a persistent 6-deck shoe. Cards 2-6 = +1, 7-9 = 0, 10-A = -1. The running count is normalized by decks remaining to produce a true count. Each agent interprets the true count relative to their own threshold to determine whether they have an advantage.
+A population-based optimization algorithm that drives agent evolution:
 
-**Position-Aware Risk:** Agents behind the leader bet more aggressively (up to 2.5x) to catch up. Leaders play conservatively (0.8x) to protect their bankroll. The count signal and recent streak further modulate bet sizing, creating a combined risk factor between 0.5x and 8x.
+1. Sample a population of strategies from a probability distribution
+2. Simulate hundreds of blackjack hands per strategy
+3. Rank strategies by total profit (fitness)
+4. Select the top performers (elite fraction)
+5. Update the distribution mean and variance toward the elites
+6. Repeat
 
-**Rounds:** The shoe reshuffles at 75% penetration, starting a new round. Bankrupt agents (bankroll hits $0) are eliminated until the next round, when all agents revive with fresh $1,000. EMA-smoothed bankroll carries across rounds so past performance influences future rankings.
+Over generations, the population converges on strategies that minimize losses against the house edge.
 
-## Key Features
+### Hi-Lo Card Counting
 
-- Live blackjack table with dealer cards and per-agent hands
+All agents share a persistent 6-deck shoe (312 cards):
+
+| Card | Count Value |
+|------|-------------|
+| 2-6  | +1          |
+| 7-9  | 0           |
+| 10-A | -1          |
+
+The running count is normalized by decks remaining to produce a **true count**. Each agent interprets the true count relative to their own DNA threshold. An agent with threshold 1.0 sees TC +1 as advantageous, while an agent with threshold 2.5 sees the same count as neutral. This creates diverse strategies competing at the same table.
+
+### Strategy DNA
+
+Each agent is defined by three parameters:
+
+| Parameter | Description | Typical Range |
+|-----------|-------------|---------------|
+| **Threshold** | True count at which the agent starts betting big | TC +1 to +3 |
+| **Slope** | How aggressively bets scale above the threshold | 0.5 to 2.0 per TC |
+| **Max Spread** | Maximum bet multiplier | 4x to 12x |
+
+### Position-Aware Risk
+
+Agents adjust their betting based on three factors:
+
+| Factor | Signal | Range |
+|--------|--------|-------|
+| Position | Bankroll vs leader | 0.7x (ahead) to 2.5x (behind) |
+| Count | True count advantage/disadvantage | 0.6x to 1.5x |
+| Momentum | Recent win/loss streak | 0.9x to 1.3x |
+
+Combined risk factor is capped between 0.5x and 8x, consistent with real blackjack bet spreads.
+
+### Rounds
+
+The shoe reshuffles at 75% penetration, starting a new round. Bankrupt agents ($0 bankroll) are eliminated until the next round when all agents revive with fresh $1,000. EMA-smoothed bankroll carries across rounds so past performance influences future rankings.
+
+## Features
+
+- Live blackjack table with animated dealer and per-agent hands
 - Per-agent card counting with individual threshold interpretation
-- Champion/Challenger dethrone system with sustained performance requirement
+- Champion/Challenger system with sustained-performance dethrone rule
 - Hot streak detection (3+ consecutive profitable generations)
-- Round history with click-to-view past round snapshots
-- Learning Progress dashboard with fitness trends, DNA convergence, and round-over-round performance
+- Round history with clickable snapshots of past rounds
+- Learning Progress dashboard showing fitness trends, DNA convergence, and round-over-round performance
 - Interactive legend with hover tooltips explaining every metric
-- All training runs in a Web Worker to keep the UI at 60fps
+- Training runs in a Web Worker for smooth 60fps UI
 - localStorage persistence to resume training across sessions
 
 ## Stack
 
-- Vite + React + TypeScript
-- Tailwind CSS
-- Framer Motion
-- Zustand
-- Web Workers
+| Layer | Technology |
+|-------|-----------|
+| Framework | React + TypeScript |
+| Build | Vite |
+| Styling | Tailwind CSS |
+| Animation | Framer Motion |
+| State | Zustand |
+| Compute | Web Workers |
+| Persistence | localStorage |
 
-## Development
+## Getting Started
 
 ```bash
 npm install
@@ -49,3 +104,8 @@ npm run dev
 npm run build
 npm run preview
 ```
+
+## Author
+
+**Anthony Feliz**
+[GitHub](https://github.com/arfgit) | [LinkedIn](https://linkedin.com/in/anthonyfeliz)
