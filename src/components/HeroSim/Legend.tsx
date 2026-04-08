@@ -9,9 +9,10 @@ interface LegendItemProps {
   badge?: boolean
   dashed?: boolean
   tooltip: string
+  icon?: React.ReactNode
 }
 
-function LegendItem({ label, color = 'text-text-muted', badge, dashed, tooltip }: LegendItemProps) {
+function LegendItem({ label, color = 'text-text-muted', badge, dashed, tooltip, icon }: LegendItemProps) {
   const [showTip, setShowTip] = useState(false)
 
   return (
@@ -36,6 +37,7 @@ function LegendItem({ label, color = 'text-text-muted', badge, dashed, tooltip }
         )}
         aria-label={`${label}: ${tooltip}`}
       >
+        {icon}
         {label}
         <Info size={8} className="text-text-muted/50 shrink-0" />
       </span>
@@ -64,8 +66,8 @@ export default function Legend() {
     <div className="space-y-3">
       <div className="rounded-xl border border-border bg-bg-secondary/60 backdrop-blur-sm p-3 sm:p-4 overflow-visible">
         <div className="flex flex-wrap items-center gap-2 sm:gap-3">
-          <LegendItem label="CHAMP" color="text-accent" badge tooltip="Agent with the highest EMA-smoothed bankroll. Takes the crown when sustained performance beats all others." />
-          <LegendItem label="CHAL" color="text-warning" badge dashed tooltip="Second-highest EMA bankroll. If it exceeds the champion by 1%+ for 2 consecutive generations, it dethrones them." />
+          <LegendItem label="CHAMP" color="text-accent" badge tooltip="Agent with the highest EMA-smoothed bankroll. Takes the crown when sustained performance beats all others." icon={<svg width="10" height="10" viewBox="0 0 20 20" fill="currentColor" className="shrink-0 drop-shadow-[0_0_4px_rgba(34,211,238,0.6)]" style={{ marginTop: '-1px' }}><path d="M1 16h18v2H1zm1-1L0 6l5 3.5L10 2l5 7.5L20 6l-2 9z"/></svg>} />
+          <LegendItem label="CHAL" color="text-warning" badge dashed tooltip="Second-highest EMA bankroll. If it exceeds the champion by 1%+ for 2 consecutive generations, it dethrones them." icon={<svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" className="shrink-0 drop-shadow-[0_0_3px_rgba(251,191,36,0.5)]" style={{ marginTop: '-1px' }}><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01z"/></svg>} />
           <LegendItem label="OUT" color="text-text-muted" badge tooltip="Bankrupt. Bankroll hit $0. Eliminated until the shoe reshuffles and a new round begins." />
           <LegendItem label="HOT" color="text-orange-400" badge tooltip="On a hot streak. 3+ consecutive profitable generations. Any agent can be HOT, including the champion and challenger." />
 
@@ -85,6 +87,29 @@ export default function Legend() {
           <LegendItem label="ADV" color="text-success" tooltip="True count > 2. More high cards (10s, Aces) remain in the shoe, giving the player an advantage. Agents bet bigger here." />
           <LegendItem label="NEU" color="text-text-muted" tooltip="True count between -1 and 2. No significant edge for player or dealer." />
           <LegendItem label="DIS" color="text-danger" tooltip="True count < -1. More low cards remain, giving the dealer an advantage. Smart agents bet minimum here." />
+
+          <Divider />
+
+          <div className="relative inline-flex items-center gap-1.5 text-[10px] sm:text-[11px]"
+            tabIndex={0}
+            onMouseEnter={(e) => { const el = e.currentTarget.querySelector('[data-tip]') as HTMLElement; if (el) el.style.display = 'block' }}
+            onMouseLeave={(e) => { const el = e.currentTarget.querySelector('[data-tip]') as HTMLElement; if (el) el.style.display = 'none' }}
+            onFocus={(e) => { const el = e.currentTarget.querySelector('[data-tip]') as HTMLElement; if (el) el.style.display = 'block' }}
+            onBlur={(e) => { const el = e.currentTarget.querySelector('[data-tip]') as HTMLElement; if (el) el.style.display = 'none' }}
+          >
+            <div className="flex h-2 w-10 rounded-full overflow-hidden">
+              <div className="bg-success w-1/2" />
+              <div className="bg-warning w-1/6" />
+              <div className="bg-danger w-1/3" />
+            </div>
+            <span className="text-text-muted">Odds</span>
+            <Info size={8} className="text-text-muted/50 shrink-0" />
+            <div data-tip style={{ display: 'none' }} className="absolute z-[70] bottom-full left-0 mb-2 px-3 py-2 rounded-lg bg-bg-secondary border border-border shadow-lg text-[11px] text-text-secondary leading-relaxed w-56 pointer-events-none">
+              <div className="font-semibold text-text-primary mb-0.5">Monte Carlo Odds</div>
+              Win/Push/Lose probability bar. Only shown on CHAMP and CHAL agents. Estimated via Monte Carlo simulation based on the current true count and game state.
+              <div className="absolute top-full left-3 -mt-px w-2 h-2 rotate-45 bg-bg-secondary border-r border-b border-border" />
+            </div>
+          </div>
 
           <Divider />
 
@@ -111,7 +136,7 @@ export default function Legend() {
         >
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             <div className="rounded-lg border border-border bg-bg-secondary/40 p-5">
-              <h4 className="text-sm font-display font-semibold text-text-primary mb-2">Cross-Entropy Method</h4>
+              <h3 className="text-sm font-display font-semibold text-text-primary mb-2">Cross-Entropy Method</h3>
               <p className="text-xs text-text-secondary leading-relaxed">
                 Agents evolve strategies using CEM, a population-based optimization algorithm.
                 Each generation, the top performers pass their DNA to the next. Strategies are
@@ -120,7 +145,7 @@ export default function Legend() {
             </div>
 
             <div className="rounded-lg border border-border bg-bg-secondary/40 p-5">
-              <h4 className="text-sm font-display font-semibold text-text-primary mb-2">Strategy DNA</h4>
+              <h3 className="text-sm font-display font-semibold text-text-primary mb-2">Strategy DNA</h3>
               <p className="text-xs text-text-secondary leading-relaxed">
                 Each agent has three genes: <span className="font-mono text-text-primary">threshold</span> (when to bet big),
                 <span className="font-mono text-text-primary"> slope</span> (how aggressively), and
@@ -130,7 +155,7 @@ export default function Legend() {
             </div>
 
             <div className="rounded-lg border border-border bg-bg-secondary/40 p-5">
-              <h4 className="text-sm font-display font-semibold text-text-primary mb-2">Hi-Lo Card Counting</h4>
+              <h3 className="text-sm font-display font-semibold text-text-primary mb-2">Hi-Lo Card Counting</h3>
               <p className="text-xs text-text-secondary leading-relaxed">
                 All agents share a 6-deck shoe. Cards 2–6 = +1, 7–9 = 0, 10–A = −1.
                 The <span className="font-mono text-text-primary">true count</span> (RC ÷ decks remaining)
@@ -139,7 +164,7 @@ export default function Legend() {
             </div>
 
             <div className="rounded-lg border border-border bg-bg-secondary/40 p-5">
-              <h4 className="text-sm font-display font-semibold text-text-primary mb-2">Bankroll &amp; Risk</h4>
+              <h3 className="text-sm font-display font-semibold text-text-primary mb-2">Bankroll &amp; Risk</h3>
               <p className="text-xs text-text-secondary leading-relaxed">
                 Every agent starts with $1,000 per round. Agents behind bet up to 10x more aggressively.
                 Leaders play 0.8x safer. Hit $0 and you're eliminated until the next round.
@@ -147,7 +172,7 @@ export default function Legend() {
             </div>
 
             <div className="rounded-lg border border-border bg-bg-secondary/40 p-5">
-              <h4 className="text-sm font-display font-semibold text-text-primary mb-2">Dealer &amp; Shoe</h4>
+              <h3 className="text-sm font-display font-semibold text-text-primary mb-2">Dealer &amp; Shoe</h3>
               <p className="text-xs text-text-secondary leading-relaxed">
                 The dealer draws from a shared 6-deck shoe (312 cards). At 75% penetration the shoe
                 reshuffles and a new round begins. Running count and true count reset on reshuffle.
@@ -155,7 +180,7 @@ export default function Legend() {
             </div>
 
             <div className="rounded-lg border border-border bg-bg-secondary/40 p-5">
-              <h4 className="text-sm font-display font-semibold text-text-primary mb-2">Rounds &amp; Rankings</h4>
+              <h3 className="text-sm font-display font-semibold text-text-primary mb-2">Rounds &amp; Rankings</h3>
               <p className="text-xs text-text-secondary leading-relaxed">
                 When the shoe reshuffles, bankrupt agents revive with fresh $1,000. EMA-smoothed
                 bankroll carries across rounds so past performance matters. Any agent can take the

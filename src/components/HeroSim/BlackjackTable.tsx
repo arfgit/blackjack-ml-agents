@@ -49,28 +49,28 @@ export default function DealerBar({ dealerCards, isRunning, shoe }: DealerBarPro
       </div>
 
       {shoe && (
-        <div className="flex items-center gap-3 sm:gap-4 mt-2 pt-2 border-t border-border/30">
+        <div className="grid grid-cols-5 sm:grid-cols-6 gap-2 mt-2 pt-2 border-t border-border/30">
           <div className="text-center">
             <span className="text-[8px] text-text-muted uppercase tracking-widest block">Cards</span>
-            <span className="text-[10px] font-mono font-semibold text-text-primary tabular-nums">{shoe.cardsRemaining}/{shoe.totalCards}</span>
+            <span className="text-[10px] font-mono font-semibold text-text-primary tabular-nums">{String(shoe.cardsRemaining).padStart(3, '\u2007')}/{shoe.totalCards}</span>
           </div>
           <div className="text-center hidden sm:block">
             <span className="text-[8px] text-text-muted uppercase tracking-widest block">Decks</span>
-            <span className="text-[10px] font-mono font-semibold text-text-primary tabular-nums">{shoe.decksRemaining}</span>
+            <span className="text-[10px] font-mono font-semibold text-text-primary tabular-nums">{shoe.decksRemaining.toFixed(1)}</span>
           </div>
           <div className="text-center">
             <span className="text-[8px] text-text-muted uppercase tracking-widest block">RC</span>
             <span className={clsx('text-[10px] font-mono font-semibold tabular-nums', countStateColors[countState])}>
-              {shoe.runningCount > 0 ? '+' : ''}{shoe.runningCount}
+              {shoe.runningCount >= 0 ? '+' : ''}{String(shoe.runningCount).padStart(2, '\u2007')}
             </span>
           </div>
           <div className="text-center">
             <span className="text-[8px] text-text-muted uppercase tracking-widest block">TC</span>
             <span className={clsx('text-[10px] font-mono font-semibold tabular-nums', countStateColors[countState])}>
-              {shoe.trueCount > 0 ? '+' : ''}{shoe.trueCount}
+              {shoe.trueCount >= 0 ? '+' : ''}{shoe.trueCount.toFixed(1)}
             </span>
           </div>
-          <div className="flex-1 min-w-8 max-w-20">
+          <div>
             <span className="text-[8px] text-text-muted uppercase tracking-widest block text-center">Pen</span>
             <div className="w-full h-1.5 rounded-full bg-bg-tertiary overflow-hidden mt-0.5">
               <div
@@ -82,7 +82,7 @@ export default function DealerBar({ dealerCards, isRunning, shoe }: DealerBarPro
               />
             </div>
           </div>
-          <div className="text-center hidden sm:block">
+          <div className="text-center">
             <span className="text-[8px] text-text-muted uppercase tracking-widest block">Round</span>
             <span className="text-[10px] font-mono font-semibold text-text-primary tabular-nums">{shoe.round}</span>
           </div>

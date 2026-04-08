@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import clsx from 'clsx'
 import type { CEMState } from '@/lib/cem'
 import type { RoundSnapshot } from './StatsPanel'
@@ -28,11 +28,31 @@ export default function LearningInsights({ state, roundHistory }: LearningInsigh
   const history = state.fitnessHistory
   const avgHistory = state.avgHistory
 
+  const bestTrend: 'up' | 'flat' | 'wait' =
+    history.length <= 5 ? 'wait' :
+    history.slice(-5).reduce((a, b) => a + b, 0) / 5 > history.slice(0, 5).reduce((a, b) => a + b, 0) / 5 ? 'up' : 'flat'
+
+  const bestTrendText = {
+    up: 'Trending up. Agents are finding better strategies over time.',
+    flat: 'Flat or noisy. CEM is exploring but not yet converging on better strategies.',
+    wait: 'Not enough data yet. Watch for the line to trend upward.',
+  }
+
   const earlyAvg = avgHistory.length >= 10 ? avgHistory.slice(0, 5).reduce((a, b) => a + b, 0) / 5 : null
   const recentAvg = avgHistory.length >= 10 ? avgHistory.slice(-5).reduce((a, b) => a + b, 0) / 5 : null
   const avgImprovement = earlyAvg !== null && recentAvg !== null && earlyAvg !== 0
     ? ((recentAvg - earlyAvg) / Math.abs(earlyAvg)) * 100
     : null
+
+  const avgTrend: 'rising' | 'dropping' | 'stable' =
+    avgImprovement !== null && avgImprovement > 5 ? 'rising' :
+    avgImprovement !== null && avgImprovement < -5 ? 'dropping' : 'stable'
+
+  const avgTrendText = {
+    rising: 'Population average is rising. The whole population is getting smarter, not just the elite.',
+    dropping: 'Population average is dropping. This can happen during exploration phases.',
+    stable: 'Relatively stable. The population is maintaining consistent performance.',
+  }
 
   const thresholdDrift = Math.abs(state.bestDNA.threshold - 2.0)
   const isConverging = thresholdDrift < 1.5
@@ -108,13 +128,20 @@ export default function LearningInsights({ state, roundHistory }: LearningInsigh
                   <MiniChart data={history} width={240} height={36} color="var(--color-accent)" />
                 </div>
               )}
-              <p className="text-[10px] text-text-muted mt-2 leading-relaxed">
-                {history.length > 5 && history[history.length - 1] > history[0]
-                  ? 'Trending up. Agents are finding better strategies over time.'
-                  : history.length > 5
-                    ? 'Flat or noisy. CEM is exploring but not yet converging on better strategies.'
-                    : 'Not enough data yet. Watch for the line to trend upward.'}
-              </p>
+              <div className="mt-2 h-8 relative overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={bestTrend}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.4, ease: 'easeInOut' }}
+                    className="text-[10px] text-text-muted leading-relaxed absolute inset-x-0"
+                  >
+                    {bestTrendText[bestTrend]}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
             </div>
 
             <div className="rounded-lg border border-border bg-bg-tertiary/30 p-3">
@@ -124,13 +151,20 @@ export default function LearningInsights({ state, roundHistory }: LearningInsigh
                   <MiniChart data={avgHistory} width={240} height={36} color="var(--color-warning)" />
                 </div>
               )}
-              <p className="text-[10px] text-text-muted mt-2 leading-relaxed">
-                {avgImprovement !== null && avgImprovement > 5
-                  ? 'Population average is rising. The whole population is getting smarter, not just the elite.'
-                  : avgImprovement !== null && avgImprovement < -5
-                    ? 'Population average is dropping. This can happen during exploration phases.'
-                    : 'Relatively stable. The population is maintaining consistent performance.'}
-              </p>
+              <div className="mt-2 h-8 relative overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.p
+                    key={avgTrend}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -6 }}
+                    transition={{ duration: 0.4, ease: 'easeInOut' }}
+                    className="text-[10px] text-text-muted leading-relaxed absolute inset-x-0"
+                  >
+                    {avgTrendText[avgTrend]}
+                  </motion.p>
+                </AnimatePresence>
+              </div>
             </div>
           </div>
 
