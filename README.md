@@ -2,17 +2,11 @@
 
 An interactive simulation of AI agents learning to play blackjack through evolutionary optimization.
 
-https://github.com/user-attachments/assets/ml-blackjack.mov
+![Blackjack ML Agents Demo](ml-blackjack.gif)
 
 ## About
 
 This project demonstrates machine learning, algorithmic thinking, and systems design through a live blackjack simulation. Five AI agents compete at a shared table, each evolving their own betting strategy over time using the Cross-Entropy Method. The simulation visualizes how agents learn to exploit card counting signals, manage risk based on their position, and adapt to changing conditions across rounds. Built as a technical showcase exploring the intersection of reinforcement learning concepts and interactive web development.
-
-## Demo
-
-https://user-images.githubusercontent.com/ml-blackjack.mov
-
-> Recording of the live simulation showing agents competing, card counting stats, and the learning progress dashboard.
 
 ## How It Works
 
