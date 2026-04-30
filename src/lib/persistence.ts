@@ -1,12 +1,12 @@
-import type { CEMState } from './cem'
+import type { CEMState } from "./cem";
 
-const STORAGE_KEY = 'blackjack-cem-snapshot'
-const VERSION = 1
+const STORAGE_KEY = "blackjack-cem-snapshot";
+const VERSION = 1;
 
 interface Snapshot {
-  version: number
-  state: CEMState
-  timestamp: number
+  version: number;
+  state: CEMState;
+  timestamp: number;
 }
 
 export function saveSnapshot(state: CEMState): void {
@@ -15,26 +15,25 @@ export function saveSnapshot(state: CEMState): void {
       version: VERSION,
       state,
       timestamp: Date.now(),
-    }
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot))
-  } catch {
-  }
+    };
+    sessionStorage.setItem(STORAGE_KEY, JSON.stringify(snapshot));
+  } catch {}
 }
 
 export function loadSnapshot(): CEMState | null {
   try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
+    const raw = sessionStorage.getItem(STORAGE_KEY);
+    if (!raw) return null;
 
-    const snapshot: Snapshot = JSON.parse(raw)
-    if (snapshot.version !== VERSION) return null
+    const snapshot: Snapshot = JSON.parse(raw);
+    if (snapshot.version !== VERSION) return null;
 
-    return snapshot.state
+    return snapshot.state;
   } catch {
-    return null
+    return null;
   }
 }
 
 export function clearSnapshot(): void {
-  localStorage.removeItem(STORAGE_KEY)
+  sessionStorage.removeItem(STORAGE_KEY);
 }
